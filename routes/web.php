@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Route;
 
 // Redirect root ke halaman login agar lebih rapi
 Route::get('/', function () {
-    return redirect('/login');
+    return view('welcome');
 });
 
 Route::get('/login', function () {
