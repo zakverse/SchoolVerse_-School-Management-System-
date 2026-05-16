@@ -58,6 +58,24 @@ Route::prefix('teacher')->group(function () {
     Route::get('/nilai', function () {
         return view('teacher_POV.nilai');
     })->name('teacher_POV.nilai');
+});
+
+    // Student Routes Group
+Route::prefix('student')->group(function () {
+    
+    Route::get('/dashboard', function () {
+        return view('student_POV.dashboard');
+    })->name('student.dashboard');
+
+    Route::get('/jadwal', function () {
+        return view('student_POV.jadwal');
+    })->name('student.jadwal');
+
+    Route::get('/rapor', function () {
+        return view('student_POV.rapor');
+    })->name('student.rapor');
     
 });
+    
+
 
