@@ -38,5 +38,26 @@ Route::prefix('admin')->group(function () {
     Route::get('/keuangan', function () {
         return view('admin_POV.keuanganSPP');
     })->name('admin_POV.keuangan');
+});    
+
+    // Teacher Routes Group
+Route::prefix('teacher')->group(function () {
+    
+    Route::get('/dashboard', function () {
+        return view('teacher_POV.dashboard');
+    })->name('teacher_POV.dashboard');
+
+    Route::get('/jadwal', function () {
+        return view('teacher_POV.jadwal');
+    })->name('teacher_POV.jadwal');
+
+    Route::get('/absensi', function () {
+        return view('teacher_POV.absensi');
+    })->name('teacher_POV.absensi');
+
+    Route::get('/nilai', function () {
+        return view('teacher_POV.nilai');
+    })->name('teacher_POV.nilai');
     
 });
+
