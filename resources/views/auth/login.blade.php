@@ -27,8 +27,14 @@
 
         <div class="mb-8">
             <h2 class="text-2xl font-extrabold text-slate-900 tracking-tight">Login ke Sistem</h2>
-            <p class="text-slate-400 text-sm mt-1.5 font-medium italic">Silakan masukkan akun Admin Anda.</p>
+            <p class="text-slate-400 text-sm mt-1.5 font-medium italic">Silakan masukkan akun Anda untuk mengakses portal.</p>
         </div>
+
+        @if ($errors->any())
+            <div class="bg-red-50 border border-red-100 rounded-none p-4 mb-6 text-xs font-semibold text-red-600">
+                ⚠️ {{ $errors->first() }}
+            </div>
+        @endif
 
         <form action="{{ route('login.post') }}" method="POST" class="space-y-6">
             @csrf
@@ -39,9 +45,9 @@
                     <div class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
                     </div>
-                    <input type="text" name="login" required 
+                    <input type="email" name="email" value="{{ old('email') }}" required 
                         class="w-full border border-slate-200 rounded-none pl-12 pr-4 py-3.5 text-sm outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-600 transition-all font-medium text-slate-700 placeholder:text-slate-300" 
-                        placeholder="admin@edumanage.com">
+                        placeholder="contoh: student1@edumanage.com">
                 </div>
             </div>
 

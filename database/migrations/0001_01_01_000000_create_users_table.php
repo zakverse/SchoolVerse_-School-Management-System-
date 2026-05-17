@@ -11,16 +11,18 @@ return new class extends Migration
      */
     public function up(): void
     {
+        // Tabel Utama Users
         Schema::create('users', function (Blueprint $table) {
             $table->id();
             $table->string('name');
             $table->string('email')->unique();
-            $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
+            $table->enum('role', ['admin', 'teacher', 'student'])->default('student');
             $table->rememberToken();
             $table->timestamps();
         });
 
+        // MASALAHNYA DI SINI KEMARIN HILANG: Kita balikin tabel password_reset_tokens & sessions bawaan Laravel
         Schema::create('password_reset_tokens', function (Blueprint $table) {
             $table->string('email')->primary();
             $table->string('token');
