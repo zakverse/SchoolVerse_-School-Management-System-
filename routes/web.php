@@ -79,4 +79,7 @@ Route::prefix('student')->middleware([RoleMiddleware::class . ':student'])->grou
     Route::get('/spp', [StudentController::class, 'spp'])->name('student.spp');
     Route::get('/profile', [StudentController::class, 'profile'])->name('student.profile');
     Route::post('/profile/password', [StudentController::class, 'updatePassword'])->name('student.profile.password');
+    Route::get('/drive', [StudentController::class, 'drive'])->name('student.drive');
+    Route::post('/drive', [StudentController::class, 'uploadFile'])->name('student.drive.post');
+    Route::delete('/drive/{file}', [StudentController::class, 'deleteFile'])->name('student.drive.delete');
 });
