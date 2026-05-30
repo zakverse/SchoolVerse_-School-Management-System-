@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Student;
 use App\Models\Schedule;
 use App\Models\Grade;
+use App\Models\StudentFile;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -174,5 +175,75 @@ class StudentController extends Controller
         ]);
 
         return redirect()->back()->with('success', 'Password berhasil diperbarui.');
+    }
+
+    /**
+     * Display student Photo Vault (Drive).
+     */
+    public function drive()
+    {
+        $student = Auth::user()->student;
+        if (!$student) {
+            abort(403, 'Profil siswa tidak ditemukan.');
+        }
+
+        $files = $student->files()->orderBy('created_at', 'desc')->paginate(12);
+
+        return view('student_POV.drive', compact('student', 'files'));
+    }
+
+    /**
+     * Handle student photo upload to Vault.
+     */
+    public function uploadFile(Request $request)
+    {
+        $request->validate([
+            'photo' => 'required|image|mimes:jpeg,png,jpg,gif,webp|max:5120', // max 5MB
+        ]);
+
+        $student = Auth::user()->student;
+        if (!$student) {
+            abort(403, 'Profil siswa tidak ditemukan.');
+        }
+
+        if ($request->hasFile('photo')) {
+            $file = $request->file('photo');
+            $originalName = $file->getClientOriginalName();
+            
+            // Store file under public storage
+            $path = $file->store('student_files', 'public');
+
+            StudentFile::create([
+                'student_id' => $student->id,
+                'title' => $originalName,
+                'file_path' => $path,
+                'file_type' => $file->getClientMimeType(),
+                'file_size' => $file->getSize(),
+            ]);
+
+            return redirect()->back()->with('success', 'Foto berhasil disimpan di Vault!');
+        }
+
+        return redirect()->back()->withErrors(['photo' => 'Gagal mengunggah file.']);
+    }
+
+    /**
+     * Handle deleting a photo from Vault.
+     */
+    public function deleteFile(StudentFile $file)
+    {
+        $student = Auth::user()->student;
+        if (!$student || $file->student_id !== $student->id) {
+            abort(403, 'Aksi tidak diizinkan.');
+        }
+
+        // Delete from physical storage
+        if (\Illuminate\Support\Facades\Storage::disk('public')->exists($file->file_path)) {
+            \Illuminate\Support\Facades\Storage::disk('public')->delete($file->file_path);
+        }
+
+        $file->delete();
+
+        return redirect()->back()->with('success', 'Foto berhasil dihapus dari Vault.');
     }
 }

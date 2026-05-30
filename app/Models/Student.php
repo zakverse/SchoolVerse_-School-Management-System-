@@ -49,4 +49,12 @@ class Student extends Model
     {
         return $this->hasMany(SppPayment::class);
     }
+
+    /**
+     * Get the uploaded files for this student.
+     */
+    public function files()
+    {
+        return $this->hasMany(StudentFile::class);
+    }
 }
