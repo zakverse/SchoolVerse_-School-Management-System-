@@ -16,33 +16,37 @@
     <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 mb-6 flex flex-wrap items-center justify-between gap-4">
         <div class="flex flex-wrap items-center gap-4 flex-1">
             <div class="flex items-center gap-2">
-                <span class="text-xs font-bold text-gray-400 uppercase tracking-wider">Kelas:</span>
-                <select class="border border-gray-200 rounded-xl px-4 py-2 text-sm font-bold bg-white text-gray-700 outline-none focus:ring-2 focus:ring-blue-500 transition-all">
-                    <option>X MIPA 1 (Matematika Wajib)</option>
-                    <option>X MIPA 2 (Matematika Wajib)</option>
-                    <option>XI MIPA 3 (Matematika Peminatan)</option>
-                </select>
-            </div>
-            <div class="flex items-center gap-2">
-                <span class="text-xs font-bold text-gray-400 uppercase tracking-wider">Jam Ke:</span>
-                <select class="border border-gray-200 rounded-xl px-4 py-2 text-sm font-bold bg-white text-gray-700 outline-none focus:ring-2 focus:ring-blue-500 transition-all">
-                    <option>2 - 3 (07:45 - 09:15)</option>
-                    <option>5 - 6 (10:00 - 11:30)</option>
+                <span class="text-xs font-bold text-gray-400 uppercase tracking-wider">Jadwal Kelas:</span>
+                <select onchange="window.location.href='?schedule_id=' + this.value" class="border border-gray-200 rounded-xl px-4 py-2 text-sm font-bold bg-white text-gray-700 outline-none focus:ring-2 focus:ring-blue-500 transition-all">
+                    @foreach($schedules as $sch)
+                        <option value="{{ $sch->id }}" {{ $activeSchedule && $activeSchedule->id === $sch->id ? 'selected' : '' }}>
+                            {{ $sch->class }} - {{ $sch->subject }} ({{ \Carbon\Carbon::parse($sch->start_time)->format('H:i') }})
+                        </option>
+                    @endforeach
                 </select>
             </div>
         </div>
         
         <div class="flex gap-4 text-xs font-bold">
-            <span class="text-emerald-600 bg-emerald-50 px-3 py-1.5 rounded-lg border border-emerald-100">Hadir: 32</span>
-            <span class="text-blue-600 bg-blue-50 px-3 py-1.5 rounded-lg border border-blue-100">Izin: 0</span>
-            <span class="text-amber-600 bg-amber-50 px-3 py-1.5 rounded-lg border border-amber-100">Sakit: 0</span>
-            <span class="text-red-600 bg-red-50 px-3 py-1.5 rounded-lg border border-red-100">Alpa: 0</span>
+            <span class="text-emerald-600 bg-emerald-50 px-3 py-1.5 rounded-lg border border-emerald-100">Hadir: {{ $stats['Hadir'] }}</span>
+            <span class="text-blue-600 bg-blue-50 px-3 py-1.5 rounded-lg border border-blue-100">Izin: {{ $stats['Izin'] }}</span>
+            <span class="text-amber-600 bg-amber-50 px-3 py-1.5 rounded-lg border border-amber-100">Sakit: {{ $stats['Sakit'] }}</span>
+            <span class="text-red-600 bg-red-50 px-3 py-1.5 rounded-lg border border-red-100">Alpa: {{ $stats['Alpa'] }}</span>
         </div>
     </div>
 
+    @if(session('success'))
+        <div class="bg-emerald-50 border border-emerald-100 text-emerald-700 px-4 py-3.5 rounded-xl mb-6 text-sm font-bold shadow-sm">
+            ✓ {{ session('success') }}
+        </div>
+    @endif
+
     <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden mb-8">
-        <form action="#" method="POST">
+        <form action="{{ route('teacher.absensi.post') }}" method="POST">
             @csrf
+            @if($activeSchedule)
+                <input type="hidden" name="schedule_id" value="{{ $activeSchedule->id }}">
+            @endif
             <div class="overflow-x-auto">
                 <table class="w-full text-left border-collapse text-sm">
                     <thead>
@@ -54,83 +58,40 @@
                         </tr>
                     </thead>
                     <tbody class="text-gray-600 divide-y divide-gray-50 font-medium">
-                        <tr class="hover:bg-slate-50/50 transition-colors">
-                            <td class="py-4 px-6 text-gray-400 font-bold">1</td>
-                            <td class="py-4 px-6 text-gray-400">21001</td>
-                            <td class="py-4 px-6 font-bold text-gray-800">Ahmad Fauzi</td>
-                            <td class="py-4 px-6">
-                                <div class="flex justify-center gap-2">
-                                    <label class="flex-1 text-center cursor-pointer">
-                                        <input type="radio" name="status[21001]" value="H" checked class="peer hidden">
-                                        <span class="block py-2 rounded-xl text-xs font-bold border border-gray-100 text-gray-400 bg-gray-50/50 peer-checked:bg-emerald-50 peer-checked:text-emerald-600 peer-checked:border-emerald-200 transition-all">Hadir</span>
-                                    </label>
-                                    <label class="flex-1 text-center cursor-pointer">
-                                        <input type="radio" name="status[21001]" value="I" class="peer hidden">
-                                        <span class="block py-2 rounded-xl text-xs font-bold border border-gray-100 text-gray-400 bg-gray-50/50 peer-checked:bg-blue-50 peer-checked:text-blue-600 peer-checked:border-blue-200 transition-all">Izin</span>
-                                    </label>
-                                    <label class="flex-1 text-center cursor-pointer">
-                                        <input type="radio" name="status[21001]" value="S" class="peer hidden">
-                                        <span class="block py-2 rounded-xl text-xs font-bold border border-gray-100 text-gray-400 bg-gray-50/50 peer-checked:bg-amber-50 peer-checked:text-amber-600 peer-checked:border-amber-200 transition-all">Sakit</span>
-                                    </label>
-                                    <label class="flex-1 text-center cursor-pointer">
-                                        <input type="radio" name="status[21001]" value="A" class="peer hidden">
-                                        <span class="block py-2 rounded-xl text-xs font-bold border border-gray-100 text-gray-400 bg-gray-50/50 peer-checked:bg-red-50 peer-checked:text-red-600 peer-checked:border-red-200 transition-all">Alpa</span>
-                                    </label>
-                                </div>
-                            </td>
-                        </tr>
-
-                        <tr class="hover:bg-slate-50/50 transition-colors">
-                            <td class="py-4 px-6 text-gray-400 font-bold">2</td>
-                            <td class="py-4 px-6 text-gray-400">21002</td>
-                            <td class="py-4 px-6 font-bold text-gray-800">Diana Putri</td>
-                            <td class="py-4 px-6">
-                                <div class="flex justify-center gap-2">
-                                    <label class="flex-1 text-center cursor-pointer">
-                                        <input type="radio" name="status[21002]" value="H" checked class="peer hidden">
-                                        <span class="block py-2 rounded-xl text-xs font-bold border border-gray-100 text-gray-400 bg-gray-50/50 peer-checked:bg-emerald-50 peer-checked:text-emerald-600 peer-checked:border-emerald-200 transition-all">Hadir</span>
-                                    </label>
-                                    <label class="flex-1 text-center cursor-pointer">
-                                        <input type="radio" name="status[21002]" value="I" class="peer hidden">
-                                        <span class="block py-2 rounded-xl text-xs font-bold border border-gray-100 text-gray-400 bg-gray-50/50 peer-checked:bg-blue-50 peer-checked:text-blue-600 peer-checked:border-blue-200 transition-all">Izin</span>
-                                    </label>
-                                    <label class="flex-1 text-center cursor-pointer">
-                                        <input type="radio" name="status[21002]" value="S" class="peer hidden">
-                                        <span class="block py-2 rounded-xl text-xs font-bold border border-gray-100 text-gray-400 bg-gray-50/50 peer-checked:bg-amber-50 peer-checked:text-amber-600 peer-checked:border-amber-200 transition-all">Sakit</span>
-                                    </label>
-                                    <label class="flex-1 text-center cursor-pointer">
-                                        <input type="radio" name="status[21002]" value="A" class="peer hidden">
-                                        <span class="block py-2 rounded-xl text-xs font-bold border border-gray-100 text-gray-400 bg-gray-50/50 peer-checked:bg-red-50 peer-checked:text-red-600 peer-checked:border-red-200 transition-all">Alpa</span>
-                                    </label>
-                                </div>
-                            </td>
-                        </tr>
-
-                        <tr class="hover:bg-slate-50/50 transition-colors">
-                            <td class="py-4 px-6 text-gray-400 font-bold">3</td>
-                            <td class="py-4 px-6 text-gray-400">21003</td>
-                            <td class="py-4 px-6 font-bold text-gray-800">Eko Prasetyo</td>
-                            <td class="py-4 px-6">
-                                <div class="flex justify-center gap-2">
-                                    <label class="flex-1 text-center cursor-pointer">
-                                        <input type="radio" name="status[21003]" value="H" checked class="peer hidden">
-                                        <span class="block py-2 rounded-xl text-xs font-bold border border-gray-100 text-gray-400 bg-gray-50/50 peer-checked:bg-emerald-50 peer-checked:text-emerald-600 peer-checked:border-emerald-200 transition-all">Hadir</span>
-                                    </label>
-                                    <label class="flex-1 text-center cursor-pointer">
-                                        <input type="radio" name="status[21003]" value="I" class="peer hidden">
-                                        <span class="block py-2 rounded-xl text-xs font-bold border border-gray-100 text-gray-400 bg-gray-50/50 peer-checked:bg-blue-50 peer-checked:text-blue-600 peer-checked:border-blue-200 transition-all">Izin</span>
-                                    </label>
-                                    <label class="flex-1 text-center cursor-pointer">
-                                        <input type="radio" name="status[21003]" value="S" class="peer hidden">
-                                        <span class="block py-2 rounded-xl text-xs font-bold border border-gray-100 text-gray-400 bg-gray-50/50 peer-checked:bg-amber-50 peer-checked:text-amber-600 peer-checked:border-amber-200 transition-all">Sakit</span>
-                                    </label>
-                                    <label class="flex-1 text-center cursor-pointer">
-                                        <input type="radio" name="status[21003]" value="A" class="peer hidden">
-                                        <span class="block py-2 rounded-xl text-xs font-bold border border-gray-100 text-gray-400 bg-gray-50/50 peer-checked:bg-red-50 peer-checked:text-red-600 peer-checked:border-red-200 transition-all">Alpa</span>
-                                    </label>
-                                </div>
-                            </td>
-                        </tr>
+                        @forelse($students as $index => $student)
+                            @php
+                                $status = $todayLogs[$student->id] ?? 'Hadir';
+                            @endphp
+                            <tr class="hover:bg-slate-50/50 transition-colors">
+                                <td class="py-4 px-6 text-gray-400 font-bold text-center">{{ $index + 1 }}</td>
+                                <td class="py-4 px-6 text-gray-400">{{ $student->nis }}</td>
+                                <td class="py-4 px-6 font-bold text-gray-800">{{ $student->name }}</td>
+                                <td class="py-4 px-6">
+                                    <div class="flex justify-center gap-2">
+                                        <label class="flex-1 text-center cursor-pointer">
+                                            <input type="radio" name="status[{{ $student->id }}]" value="H" {{ $status === 'Hadir' ? 'checked' : '' }} class="peer hidden">
+                                            <span class="block py-2 rounded-xl text-xs font-bold border border-gray-100 text-gray-400 bg-gray-50/50 peer-checked:bg-emerald-50 peer-checked:text-emerald-600 peer-checked:border-emerald-200 transition-all">Hadir</span>
+                                        </label>
+                                        <label class="flex-1 text-center cursor-pointer">
+                                            <input type="radio" name="status[{{ $student->id }}]" value="I" {{ $status === 'Izin' ? 'checked' : '' }} class="peer hidden">
+                                            <span class="block py-2 rounded-xl text-xs font-bold border border-gray-100 text-gray-400 bg-gray-50/50 peer-checked:bg-blue-50 peer-checked:text-blue-600 peer-checked:border-blue-200 transition-all">Izin</span>
+                                        </label>
+                                        <label class="flex-1 text-center cursor-pointer">
+                                            <input type="radio" name="status[{{ $student->id }}]" value="S" {{ $status === 'Sakit' ? 'checked' : '' }} class="peer hidden">
+                                            <span class="block py-2 rounded-xl text-xs font-bold border border-gray-100 text-gray-400 bg-gray-50/50 peer-checked:bg-amber-50 peer-checked:text-amber-600 peer-checked:border-amber-200 transition-all">Sakit</span>
+                                        </label>
+                                        <label class="flex-1 text-center cursor-pointer">
+                                            <input type="radio" name="status[{{ $student->id }}]" value="A" {{ $status === 'Alpa' ? 'checked' : '' }} class="peer hidden">
+                                            <span class="block py-2 rounded-xl text-xs font-bold border border-gray-100 text-gray-400 bg-gray-50/50 peer-checked:bg-red-50 peer-checked:text-red-600 peer-checked:border-red-200 transition-all">Alpa</span>
+                                        </label>
+                                    </div>
+                                </td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="4" class="py-6 px-6 text-center text-gray-400">Tidak ada data siswa.</td>
+                            </tr>
+                        @endforelse
                     </tbody>
                 </table>
             </div>

@@ -2,6 +2,9 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\TeacherController;
+use App\Http\Controllers\StudentController;
+use App\Http\Controllers\AdminController;
 use App\Http\Middleware\RoleMiddleware;
 
 /*
@@ -23,145 +26,53 @@ Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
 // ==================== 1. POV ADMIN (Protected by Admin Role) ====================
 Route::prefix('admin')->middleware([RoleMiddleware::class . ':admin'])->group(function () {
-    
-    Route::get('/dashboard', function () {
-        $totalSiswa = \App\Models\Student::count();
-        $totalGuru = \App\Models\Teacher::count();
-        
-        $today = \Carbon\Carbon::today()->format('Y-m-d');
-        $totalAttendance = \App\Models\Attendance::where('date', $today)->count();
-        $presentAttendance = \App\Models\Attendance::where('date', $today)->where('status', 'Hadir')->count();
-        $kehadiranHariIni = $totalAttendance > 0 ? round(($presentAttendance / $totalAttendance) * 100) : 98;
-        
-        $kelasAktif = \App\Models\Student::distinct('class')->count('class');
-        
-        // weekly attendance chart
-        $days = ['Monday' => 'Sen', 'Tuesday' => 'Sel', 'Wednesday' => 'Rab', 'Thursday' => 'Kam', 'Friday' => 'Jum'];
-        $chartData = [];
-        foreach ($days as $eng => $indo) {
-            $date = \Carbon\Carbon::now()->startOfWeek()->addDays(array_search($eng, array_keys($days)))->format('Y-m-d');
-            $total = \App\Models\Attendance::where('date', $date)->count();
-            $present = \App\Models\Attendance::where('date', $date)->where('status', 'Hadir')->count();
-            $chartData[$indo] = $total > 0 ? round(($present / $total) * 100) : rand(92, 98);
-        }
-        
-        $engDay = \Carbon\Carbon::now()->format('l');
-        $indoDay = match($engDay) {
-            'Monday' => 'Senin',
-            'Tuesday' => 'Selasa',
-            'Wednesday' => 'Rabu',
-            'Thursday' => 'Kamis',
-            'Friday' => 'Jumat',
-            default => 'Senin'
-        };
-        $todaySchedules = \App\Models\Schedule::with('teacher')->where('day', $indoDay)->orderBy('start_time')->get();
+    Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('admin.dashboard');
 
-        return view('admin_POV.dashboard', compact('totalSiswa', 'totalGuru', 'kehadiranHariIni', 'kelasAktif', 'chartData', 'todaySchedules'));
-    })->name('admin.dashboard');
+    // CRUD Siswa
+    Route::get('/data-siswa', [AdminController::class, 'dataSiswa'])->name('admin.datasiswa');
+    Route::post('/data-siswa', [AdminController::class, 'storeSiswa'])->name('admin.datasiswa.post');
+    Route::put('/data-siswa/{student}', [AdminController::class, 'updateSiswa'])->name('admin.datasiswa.put');
+    Route::delete('/data-siswa/{student}', [AdminController::class, 'deleteSiswa'])->name('admin.datasiswa.delete');
 
-    Route::get('/data-siswa', function () {
-        return view('admin_POV.datasiswa');
-    })->name('admin.datasiswa');
+    // CRUD Guru
+    Route::get('/data-guru', [AdminController::class, 'dataGuru'])->name('admin.dataguru');
+    Route::post('/data-guru', [AdminController::class, 'storeGuru'])->name('admin.dataguru.post');
+    Route::put('/data-guru/{teacher}', [AdminController::class, 'updateGuru'])->name('admin.dataguru.put');
+    Route::delete('/data-guru/{teacher}', [AdminController::class, 'deleteGuru'])->name('admin.dataguru.delete');
 
-    Route::get('/data-guru', function () {
-        return view('admin_POV.dataguru');
-    })->name('admin.dataguru');
+    // Jadwal Pelajaran
+    Route::get('/jadwal', [AdminController::class, 'schedule'])->name('admin.jadwal');
+    Route::post('/jadwal', [AdminController::class, 'storeSchedule'])->name('admin.jadwal.post');
+    Route::delete('/jadwal/{schedule}', [AdminController::class, 'deleteSchedule'])->name('admin.jadwal.delete');
 
-    Route::get('/jadwal', function () {
-        return view('admin_POV.jadwalpelajaran');
-    })->name('admin.jadwal');
+    // Absensi
+    Route::get('/absensi', [AdminController::class, 'attendance'])->name('admin.absensi');
+    Route::post('/absensi', [AdminController::class, 'saveAttendance'])->name('admin.absensi.post');
 
-    Route::get('/keuangan', function () {
-        return view('admin_POV.keuanganSPP');
-    })->name('admin.keuangan');
-    
+    // Nilai & Rapor
+    Route::get('/nilai', [AdminController::class, 'grades'])->name('admin.nilai');
+    Route::post('/nilai', [AdminController::class, 'saveGrades'])->name('admin.nilai.post');
+
+    // Keuangan SPP
+    Route::get('/keuangan', [AdminController::class, 'keuangan'])->name('admin.keuangan');
+    Route::post('/keuangan/pay', [AdminController::class, 'paySPP'])->name('admin.keuangan.pay');
 });    
 
 
 // ==================== 2. POV TEACHER (Protected by Teacher Role) ====================
 Route::prefix('teacher')->middleware([RoleMiddleware::class . ':teacher'])->group(function () {
-    
-    Route::get('/dashboard', function () {
-        $teacher = Auth::user()->teacher;
-        if (!$teacher) {
-            abort(403, 'Profil guru tidak ditemukan.');
-        }
-        
-        $totalJam = $teacher->schedules()->count() * 2;
-        $totalKelas = $teacher->schedules()->distinct('class')->count('class');
-        $jabatan = $teacher->jabatan;
-        
-        $engDay = \Carbon\Carbon::now()->format('l');
-        $indoDay = match($engDay) {
-            'Monday' => 'Senin',
-            'Tuesday' => 'Selasa',
-            'Wednesday' => 'Rabu',
-            'Thursday' => 'Kamis',
-            'Friday' => 'Jumat',
-            default => 'Senin'
-        };
-        
-        $todaySchedules = $teacher->schedules()->where('day', $indoDay)->orderBy('start_time')->get();
-
-        return view('teacher_POV.dashboard', compact('totalJam', 'totalKelas', 'jabatan', 'todaySchedules'));
-    })->name('teacher.dashboard');
-
-    Route::get('/jadwal', function () {
-        return view('teacher_POV.jadwal');
-    })->name('teacher.jadwal');
-
-    Route::get('/absensi', function () {
-        return view('teacher_POV.absensi');
-    })->name('teacher.absensi');
-
-    Route::get('/nilai', function () {
-        return view('teacher_POV.nilai');
-    })->name('teacher.nilai');
-    
+    Route::get('/dashboard', [TeacherController::class, 'dashboard'])->name('teacher.dashboard');
+    Route::get('/jadwal', [TeacherController::class, 'schedule'])->name('teacher.jadwal');
+    Route::get('/absensi', [TeacherController::class, 'attendance'])->name('teacher.absensi');
+    Route::post('/absensi', [TeacherController::class, 'saveAttendance'])->name('teacher.absensi.post');
+    Route::get('/nilai', [TeacherController::class, 'grades'])->name('teacher.nilai');
+    Route::post('/nilai', [TeacherController::class, 'saveGrades'])->name('teacher.nilai.post');
 });
 
 
 // ==================== 3. POV STUDENT (Protected by Student Role) ====================
 Route::prefix('student')->middleware([RoleMiddleware::class . ':student'])->group(function () {
-    
-    Route::get('/dashboard', function () {
-        $student = Auth::user()->student;
-        if (!$student) {
-            abort(403, 'Profil siswa tidak ditemukan.');
-        }
-        
-        $totalAtt = $student->attendances()->count();
-        $presentAtt = $student->attendances()->where('status', 'Hadir')->count();
-        $attendanceRate = $totalAtt > 0 ? round(($presentAtt / $totalAtt) * 100) : 100;
-        $attendanceStatus = $attendanceRate >= 90 ? 'Sangat Baik (Aman)' : ($attendanceRate >= 80 ? 'Cukup' : 'Kurang (Bahaya)');
-        
-        $averageGrade = round($student->grades()->avg('score'), 1);
-        if (!$averageGrade) {
-            $averageGrade = 0.0;
-        }
-        $gradeStatus = $averageGrade >= 75 ? 'Di atas KKM' : 'Di bawah KKM';
-        
-        $engDay = \Carbon\Carbon::now()->format('l');
-        $indoDay = match($engDay) {
-            'Monday' => 'Senin',
-            'Tuesday' => 'Selasa',
-            'Wednesday' => 'Rabu',
-            'Thursday' => 'Kamis',
-            'Friday' => 'Jumat',
-            default => 'Senin'
-        };
-        
-        $todaySchedules = \App\Models\Schedule::with('teacher')->where('class', $student->class)->where('day', $indoDay)->orderBy('start_time')->get();
-
-        return view('student_POV.dashboard', compact('attendanceRate', 'attendanceStatus', 'averageGrade', 'gradeStatus', 'todaySchedules'));
-    })->name('student.dashboard');
-
-    Route::get('/jadwal', function () {
-        return view('student_POV.jadwal');
-    })->name('student.jadwal');
-
-    Route::get('/rapor', function () {
-        return view('student_POV.rapor');
-    })->name('student.rapor');
-    
+    Route::get('/dashboard', [StudentController::class, 'dashboard'])->name('student.dashboard');
+    Route::get('/jadwal', [StudentController::class, 'schedule'])->name('student.jadwal');
+    Route::get('/rapor', [StudentController::class, 'rapor'])->name('student.rapor');
 });

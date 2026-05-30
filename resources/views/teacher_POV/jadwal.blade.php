@@ -16,7 +16,7 @@
     <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
         <div class="flex justify-between items-center mb-8 border-b border-gray-50 pb-6">
             <div class="text-sm font-semibold text-gray-700">
-                Total Beban Mengajar: <span class="text-blue-600 font-bold">24 Jam / Minggu</span>
+                Total Beban Mengajar: <span class="text-blue-600 font-bold">{{ $totalJam }} Jam / Minggu</span>
             </div>
             <div class="flex gap-4 text-[11px] font-bold uppercase tracking-wider">
                 <div class="flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-blue-500"></span> Matematika Wajib</div>
@@ -48,23 +48,17 @@
             <div class="border border-dashed border-gray-100 rounded-xl flex items-center justify-center text-gray-300 font-bold text-xs">Kosong</div>
 
             <div class="flex items-center justify-center text-[13px] font-bold text-gray-400">07:45 - 09:15</div>
-            <div class="bg-blue-50 border border-blue-100 rounded-xl p-4">
-                <p class="text-blue-600 font-bold text-sm mb-1">Matematika Wajib</p>
-                <p class="text-[11px] text-blue-400 font-medium">Kelas X MIPA 1</p>
-                <p class="text-[11px] text-blue-400 mt-2 font-medium">Ruang R.101</p>
-            </div>
-            <div class="border border-dashed border-gray-100 rounded-xl flex items-center justify-center text-gray-300 font-bold text-xs">Kosong</div>
-            <div class="border border-dashed border-gray-100 rounded-xl flex items-center justify-center text-gray-300 font-bold text-xs">Kosong</div>
-            <div class="bg-blue-50 border border-blue-100 rounded-xl p-4">
-                <p class="text-blue-600 font-bold text-sm mb-1">Matematika Wajib</p>
-                <p class="text-[11px] text-blue-400 font-medium">Kelas X MIPA 2</p>
-                <p class="text-[11px] text-blue-400 mt-2 font-medium">Ruang R.102</p>
-            </div>
-            <div class="bg-indigo-50 border border-indigo-100 rounded-xl p-4">
-                <p class="text-indigo-600 font-bold text-sm mb-1">Matematika Pem.</p>
-                <p class="text-[11px] text-indigo-400 font-medium">Kelas XII MIPA 1</p>
-                <p class="text-[11px] text-indigo-400 mt-2 font-medium">Ruang R.301</p>
-            </div>
+            @foreach(['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat'] as $day)
+                @if($sch = $schedules->first(fn($s) => $s->day === $day && $s->start_time === '07:30:00'))
+                    <div class="bg-blue-50 border border-blue-100 rounded-xl p-4">
+                        <p class="text-blue-600 font-bold text-sm mb-1">{{ $sch->subject }}</p>
+                        <p class="text-[11px] text-blue-400 font-medium">Kelas {{ $sch->class }}</p>
+                        <p class="text-[11px] text-blue-400 mt-2 font-medium">Ruang {{ $sch->room }}</p>
+                    </div>
+                @else
+                    <div class="border border-dashed border-gray-100 rounded-xl flex items-center justify-center text-gray-300 font-bold text-xs">Kosong</div>
+                @endif
+            @endforeach
 
             <div class="flex items-center justify-center text-[13px] font-bold text-gray-400 uppercase tracking-tighter">09:15 - 09:45</div>
             <div class="col-span-5 bg-amber-50/50 border border-dashed border-amber-200 rounded-xl flex items-center justify-center py-2.5">
@@ -72,15 +66,17 @@
             </div>
 
             <div class="flex items-center justify-center text-[13px] font-bold text-gray-400">09:45 - 11:15</div>
-            <div class="border border-dashed border-gray-100 rounded-xl flex items-center justify-center text-gray-300 font-bold text-xs">Kosong</div>
-            <div class="bg-indigo-50 border border-indigo-100 rounded-xl p-4">
-                <p class="text-indigo-600 font-bold text-sm mb-1">Matematika Pem.</p>
-                <p class="text-[11px] text-indigo-400 font-medium">Kelas XI MIPA 3</p>
-                <p class="text-[11px] text-indigo-400 mt-2 font-medium">Ruang R.204</p>
-            </div>
-            <div class="border border-dashed border-gray-100 rounded-xl flex items-center justify-center text-gray-300 font-bold text-xs">Kosong</div>
-            <div class="border border-dashed border-gray-100 rounded-xl flex items-center justify-center text-gray-300 font-bold text-xs">Kosong</div>
-            <div class="border border-dashed border-gray-100 rounded-xl flex items-center justify-center text-gray-300 font-bold text-xs">Kosong</div>
+            @foreach(['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat'] as $day)
+                @if($sch = $schedules->first(fn($s) => $s->day === $day && $s->start_time === '10:00:00'))
+                    <div class="bg-indigo-50 border border-indigo-100 rounded-xl p-4">
+                        <p class="text-indigo-600 font-bold text-sm mb-1">{{ $sch->subject }}</p>
+                        <p class="text-[11px] text-indigo-400 font-medium">Kelas {{ $sch->class }}</p>
+                        <p class="text-[11px] text-indigo-400 mt-2 font-medium">Ruang {{ $sch->room }}</p>
+                    </div>
+                @else
+                    <div class="border border-dashed border-gray-100 rounded-xl flex items-center justify-center text-gray-300 font-bold text-xs">Kosong</div>
+                @endif
+            @endforeach
         </div>
     </div>
 </div>

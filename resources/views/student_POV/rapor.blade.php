@@ -27,28 +27,29 @@
                 </tr>
             </thead>
             <tbody class="divide-y divide-gray-50 font-medium text-gray-600">
-                <tr class="hover:bg-slate-50/40 transition-all">
-                    <td class="py-4 px-6 text-center font-bold text-gray-400">1</td>
-                    <td class="py-4 px-6 font-bold text-gray-800">Matematika Wajib</td>
-                    <td class="py-4 px-6 text-center">88</td>
-                    <td class="py-4 px-6 text-center">85</td>
-                    <td class="py-4 px-6 text-center">90</td>
-                    <td class="py-4 px-6 text-center font-black text-indigo-600">87.5</td>
-                    <td class="py-4 px-6 text-center">
-                        <span class="bg-emerald-50 text-emerald-600 text-[10px] font-black px-3 py-1 rounded-md border border-emerald-100 uppercase">Lulus</span>
-                    </td>
-                </tr>
-                <tr class="hover:bg-slate-50/40 transition-all">
-                    <td class="py-4 px-6 text-center font-bold text-gray-400">2</td>
-                    <td class="py-4 px-6 font-bold text-gray-800">Fisika</td>
-                    <td class="py-4 px-6 text-center">80</td>
-                    <td class="py-4 px-6 text-center">78</td>
-                    <td class="py-4 px-6 text-center">85</td>
-                    <td class="py-4 px-6 text-center font-black text-indigo-600">81.0</td>
-                    <td class="py-4 px-6 text-center">
-                        <span class="bg-emerald-50 text-emerald-600 text-[10px] font-black px-3 py-1 rounded-md border border-emerald-100 uppercase">Lulus</span>
-                    </td>
-                </tr>
+                @forelse($raporData as $index => $row)
+                    <tr class="hover:bg-slate-50/40 transition-all">
+                        <td class="py-4 px-6 text-center font-bold text-gray-400">{{ $index + 1 }}</td>
+                        <td class="py-4 px-6 font-bold text-gray-800">{{ $row['subject'] }}</td>
+                        <td class="py-4 px-6 text-center">{{ $row['tugas'] }}</td>
+                        <td class="py-4 px-6 text-center">{{ $row['uts'] }}</td>
+                        <td class="py-4 px-6 text-center">{{ $row['uas'] }}</td>
+                        <td class="py-4 px-6 text-center font-black text-indigo-600">{{ $row['nilai_akhir'] }}</td>
+                        <td class="py-4 px-6 text-center">
+                            @if($row['status'] === 'Lulus')
+                                <span class="bg-emerald-50 text-emerald-600 text-[10px] font-black px-3 py-1 rounded-md border border-emerald-100 uppercase">Lulus</span>
+                            @elseif($row['status'] === 'Remedial')
+                                <span class="bg-red-50 text-red-600 text-[10px] font-black px-3 py-1 rounded-md border border-red-100 uppercase">Remedial</span>
+                            @else
+                                <span class="text-gray-400 text-[10px] font-black px-3 py-1">-</span>
+                            @endif
+                        </td>
+                    </tr>
+                @empty
+                    <tr>
+                        <td colspan="7" class="py-6 px-6 text-center text-gray-400">Belum ada data nilai rapor untuk semester ini.</td>
+                    </tr>
+                @endforelse
             </tbody>
         </table>
     </div>
