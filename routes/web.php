@@ -75,4 +75,8 @@ Route::prefix('student')->middleware([RoleMiddleware::class . ':student'])->grou
     Route::get('/dashboard', [StudentController::class, 'dashboard'])->name('student.dashboard');
     Route::get('/jadwal', [StudentController::class, 'schedule'])->name('student.jadwal');
     Route::get('/rapor', [StudentController::class, 'rapor'])->name('student.rapor');
+    Route::get('/absensi', [StudentController::class, 'attendance'])->name('student.absensi');
+    Route::get('/spp', [StudentController::class, 'spp'])->name('student.spp');
+    Route::get('/profile', [StudentController::class, 'profile'])->name('student.profile');
+    Route::post('/profile/password', [StudentController::class, 'updatePassword'])->name('student.profile.password');
 });
