@@ -25,22 +25,22 @@
         <nav class="flex-1 px-4 py-6 space-y-1.5">
             <p class="px-3 text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-3">Menu Guru</p>
 
-            <a href="{{ route('teacher_POV.dashboard') }}" class="flex items-center gap-3 px-4 py-3 rounded-xl font-semibold text-sm transition-all {{ Request::is('teacher/dashboard') ? 'bg-blue-600 text-white shadow-lg shadow-blue-700/20' : 'text-slate-300 hover:bg-white/5 hover:text-white' }}">
+            <a href="{{ route('teacher.dashboard') }}" class="flex items-center gap-3 px-4 py-3 rounded-xl font-semibold text-sm transition-all {{ Request::is('teacher/dashboard') ? 'bg-blue-600 text-white shadow-lg shadow-blue-700/20' : 'text-slate-300 hover:bg-white/5 hover:text-white' }}">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path></svg>
                 Dashboard
             </a>
 
-            <a href="{{ route('teacher_POV.jadwal') }}" class="flex items-center gap-3 px-4 py-3 rounded-xl font-semibold text-sm transition-all {{ Request::is('teacher/jadwal') ? 'bg-blue-600 text-white shadow-lg shadow-blue-700/20' : 'text-slate-300 hover:bg-white/5 hover:text-white' }}">
+            <a href="{{ route('teacher.jadwal') }}" class="flex items-center gap-3 px-4 py-3 rounded-xl font-semibold text-sm transition-all {{ Request::is('teacher/jadwal') ? 'bg-blue-600 text-white shadow-lg shadow-blue-700/20' : 'text-slate-300 hover:bg-white/5 hover:text-white' }}">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
                 Jadwal Mengajar
             </a>
 
-            <a href="{{ route('teacher_POV.absensi') }}" class="flex items-center gap-3 px-4 py-3 rounded-xl font-semibold text-sm transition-all {{ Request::is('teacher/absensi') ? 'bg-blue-600 text-white shadow-lg shadow-blue-700/20' : 'text-slate-300 hover:bg-white/5 hover:text-white' }}">
+            <a href="{{ route('teacher.absensi') }}" class="flex items-center gap-3 px-4 py-3 rounded-xl font-semibold text-sm transition-all {{ Request::is('teacher/absensi') ? 'bg-blue-600 text-white shadow-lg shadow-blue-700/20' : 'text-slate-300 hover:bg-white/5 hover:text-white' }}">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path></svg>
                 Presensi Siswa
             </a>
 
-            <a href="{{ route('teacher_POV.nilai') }}" class="flex items-center gap-3 px-4 py-3 rounded-xl font-semibold text-sm transition-all {{ Request::is('teacher/nilai') ? 'bg-blue-600 text-white shadow-lg shadow-blue-700/20' : 'text-slate-300 hover:bg-white/5 hover:text-white' }}">
+            <a href="{{ route('teacher.nilai') }}" class="flex items-center gap-3 px-4 py-3 rounded-xl font-semibold text-sm transition-all {{ Request::is('teacher/nilai') ? 'bg-blue-600 text-white shadow-lg shadow-blue-700/20' : 'text-slate-300 hover:bg-white/5 hover:text-white' }}">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
                 Input Nilai & Rapor
             </a>
@@ -48,15 +48,22 @@
 
         <div class="p-4 border-t border-slate-700/50 flex items-center justify-between">
             <div class="flex items-center gap-3">
-                <div class="w-9 h-9 rounded-full bg-blue-500/20 text-blue-400 border border-blue-500/30 flex items-center justify-center font-bold text-sm uppercase">
-                    BS
-                </div>
+                @if(Auth::user()->teacher && Auth::user()->teacher->profile_picture)
+                    <img src="{{ Auth::user()->teacher->profile_picture }}" alt="Profil" class="w-9 h-9 rounded-full object-cover border border-slate-600">
+                @else
+                    <div class="w-9 h-9 rounded-full bg-blue-500/20 text-blue-400 border border-blue-500/30 flex items-center justify-center font-bold text-sm uppercase">
+                        {{ strtoupper(substr(Auth::user()->teacher->name ?? Auth::user()->name ?? 'G', 0, 2)) }}
+                    </div>
+                @endif
                 <div>
-                    <p class="text-xs font-bold text-white truncate max-w-[120px]">Budi Santoso, M.Pd</p>
-                    <p class="text-[10px] text-slate-400 font-medium mt-0.5">Guru Matematika</p>
+                    <p class="text-xs font-bold text-white truncate max-w-[120px]">{{ Auth::user()->teacher->name ?? Auth::user()->name }}</p>
+                    <p class="text-[10px] text-slate-400 font-medium mt-0.5 truncate max-w-[120px]">{{ Auth::user()->teacher->mapel ?? 'Guru' }}</p>
                 </div>
             </div>
-            <a href="/login" class="text-slate-400 hover:text-red-400 transition-colors p-1.5 rounded-lg hover:bg-white/5">
+            <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
+                @csrf
+            </form>
+            <a href="#" onclick="event.preventDefault(); document.getElementById('logout-form').submit();" class="text-slate-400 hover:text-red-400 transition-colors p-1.5 rounded-lg hover:bg-white/5" title="Keluar">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
             </a>
         </div>

@@ -3,22 +3,22 @@
 @section('content')
 <div class="animate-in fade-in duration-300">
     <div class="mb-8">
-        <h2 class="text-2xl font-extrabold text-gray-900">Halo, Pak Budi Santoso 👋</h2>
+        <h2 class="text-2xl font-extrabold text-gray-900">Halo, {{ Auth::user()->teacher->name ?? Auth::user()->name }} 👋</h2>
         <p class="text-gray-500 text-sm mt-1">Berikut adalah ringkasan aktivitas mengajar Anda hari ini.</p>
     </div>
 
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
         <div class="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
             <p class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Total Jam Mengajar</p>
-            <h3 class="text-3xl font-black text-gray-800">24 Jam <span class="text-sm font-medium text-gray-400">/ minggu</span></h3>
+            <h3 class="text-3xl font-black text-gray-800">{{ $totalJam }} Jam <span class="text-sm font-medium text-gray-400">/ minggu</span></h3>
         </div>
         <div class="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
             <p class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Kelas Diampu</p>
-            <h3 class="text-3xl font-black text-gray-800">4 Kelas</h3>
+            <h3 class="text-3xl font-black text-gray-800">{{ $totalKelas }} Kelas</h3>
         </div>
         <div class="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
             <p class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Tugas Tambahan</p>
-            <h3 class="text-lg font-bold text-blue-600 mt-1.5">Wali Kelas X MIPA 1</h3>
+            <h3 class="text-lg font-bold text-blue-600 mt-1.5">{{ $jabatan ?? 'Guru Pengajar' }}</h3>
         </div>
     </div>
 
@@ -30,27 +30,20 @@
             </h3>
             
             <div class="space-y-4">
-                <div class="flex items-center justify-between p-4 bg-blue-50/50 border border-blue-100/50 rounded-xl">
-                    <div class="flex items-center gap-4">
-                        <div class="bg-blue-600 text-white font-bold text-xs px-3 py-2 rounded-lg">Jam 2-3</div>
-                        <div>
-                            <p class="font-bold text-gray-800 text-sm">Matematika Wajib</p>
-                            <p class="text-xs text-gray-400 mt-0.5">Kelas X MIPA 1 • Ruang R.101</p>
+                @forelse($todaySchedules as $index => $sch)
+                    <div class="flex items-center justify-between p-4 {{ $index === 0 ? 'bg-blue-50/50 border border-blue-100/50' : 'bg-gray-50 border border-gray-100' }} rounded-xl">
+                        <div class="flex items-center gap-4">
+                            <div class="{{ $index === 0 ? 'bg-blue-600' : 'bg-gray-400' }} text-white font-bold text-xs px-3 py-2 rounded-lg">Pelajaran {{ $index + 1 }}</div>
+                            <div>
+                                <p class="font-bold {{ $index === 0 ? 'text-gray-800' : 'text-gray-700' }} text-sm">{{ $sch->subject }}</p>
+                                <p class="text-xs text-gray-400 mt-0.5">Kelas {{ $sch->class }} • Ruang {{ $sch->room }}</p>
+                            </div>
                         </div>
+                        <span class="text-xs font-bold {{ $index === 0 ? 'text-blue-600' : 'text-gray-400' }}">{{ \Carbon\Carbon::parse($sch->start_time)->format('H:i') }} - {{ \Carbon\Carbon::parse($sch->end_time)->format('H:i') }}</span>
                     </div>
-                    <span class="text-xs font-bold text-blue-600">07:45 - 09:15</span>
-                </div>
-
-                <div class="flex items-center justify-between p-4 bg-gray-50 border border-gray-100 rounded-xl">
-                    <div class="flex items-center gap-4">
-                        <div class="bg-gray-400 text-white font-bold text-xs px-3 py-2 rounded-lg">Jam 5-6</div>
-                        <div>
-                            <p class="font-bold text-gray-700 text-sm">Matematika Peminatan</p>
-                            <p class="text-xs text-gray-400 mt-0.5">Kelas XI MIPA 3 • Ruang R.204</p>
-                        </div>
-                    </div>
-                    <span class="text-xs font-bold text-gray-400">10:00 - 11:30</span>
-                </div>
+                @empty
+                    <p class="text-gray-400 text-sm text-center py-6">Tidak ada jadwal mengajar hari ini.</p>
+                @endforelse
             </div>
         </div>
 

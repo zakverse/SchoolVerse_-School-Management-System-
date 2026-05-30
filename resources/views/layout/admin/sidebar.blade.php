@@ -44,13 +44,18 @@
 
         <div class="p-4 border-t border-white/5 bg-[#1e2f4c] flex justify-between items-center">
             <div class="flex items-center gap-3">
-                <div class="w-9 h-9 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold text-sm">A</div>
+                <div class="w-9 h-9 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold text-sm">
+                    {{ strtoupper(substr(Auth::user()->name ?? 'A', 0, 1)) }}
+                </div>
                 <div>
-                    <p class="font-semibold text-sm text-white leading-tight">Admin Sekolah</p>
-                    <p class="text-[11px] text-gray-400">Tata Usaha</p>
+                    <p class="font-semibold text-sm text-white leading-tight">{{ Auth::user()->name ?? 'Admin' }}</p>
+                    <p class="text-[11px] text-gray-400">Super Admin</p>
                 </div>
             </div>
-            <button class="text-gray-400 hover:text-white">
+            <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
+                @csrf
+            </form>
+            <button onclick="event.preventDefault(); document.getElementById('logout-form').submit();" class="text-gray-400 hover:text-white" title="Keluar">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
             </button>
         </div>

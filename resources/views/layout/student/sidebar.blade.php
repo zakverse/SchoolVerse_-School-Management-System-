@@ -22,11 +22,11 @@
 
                 <div class="p-5 border-b border-slate-200/60 flex items-center gap-3 bg-white/50 backdrop-blur-sm">
                     <div class="w-10 h-10 rounded-full bg-blue-600/10 border border-blue-500/20 flex items-center justify-center font-black text-blue-600 shadow-inner">
-                        DZ
+                        {{ strtoupper(substr(Auth::user()->student->name ?? Auth::user()->name ?? 'S', 0, 2)) }}
                     </div>
                     <div>
-                        <h4 class="text-sm font-bold text-slate-800 leading-tight">Dzaki Khothir</h4>
-                        <p class="text-xs text-slate-400 mt-0.5 font-medium">X MIPA 1 • NIS 21045</p>
+                        <h4 class="text-sm font-bold text-slate-800 leading-tight">{{ Auth::user()->student->name ?? Auth::user()->name }}</h4>
+                        <p class="text-xs text-slate-400 mt-0.5 font-medium">{{ Auth::user()->student->class ?? 'Siswa' }} • NIS {{ Auth::user()->student->nis ?? '-' }}</p>
                     </div>
                 </div>
 
@@ -49,7 +49,10 @@
             </div>
 
             <div class="p-4 border-t border-slate-200/60 bg-white/40">
-                <a href="/login" class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold text-red-500 hover:bg-red-50 transition-all">
+                <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
+                    @csrf
+                </form>
+                <a href="#" onclick="event.preventDefault(); document.getElementById('logout-form').submit();" class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold text-red-500 hover:bg-red-50 transition-all">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
                     Keluar Aplikasi
                 </a>

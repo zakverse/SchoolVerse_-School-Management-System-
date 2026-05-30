@@ -9,7 +9,7 @@
             </div>
             <div>
                 <div class="text-xs text-gray-500 font-medium mb-0.5">Total Siswa</div>
-                <div class="text-2xl font-bold text-gray-800">1,240</div>
+                <div class="text-2xl font-bold text-gray-800">{{ number_format($totalSiswa) }}</div>
             </div>
         </div>
         <div class="bg-white rounded-xl border border-gray-100 p-6 shadow-sm flex items-center gap-5">
@@ -18,7 +18,7 @@
             </div>
             <div>
                 <div class="text-xs text-gray-500 font-medium mb-0.5">Total Guru</div>
-                <div class="text-2xl font-bold text-gray-800">85</div>
+                <div class="text-2xl font-bold text-gray-800">{{ number_format($totalGuru) }}</div>
             </div>
         </div>
         <div class="bg-white rounded-xl border border-gray-100 p-6 shadow-sm flex items-center gap-5">
@@ -27,7 +27,7 @@
             </div>
             <div>
                 <div class="text-xs text-gray-500 font-medium mb-0.5">Kehadiran Hari Ini</div>
-                <div class="text-2xl font-bold text-gray-800">96%</div>
+                <div class="text-2xl font-bold text-gray-800">{{ $kehadiranHariIni }}%</div>
             </div>
         </div>
         <div class="bg-white rounded-xl border border-gray-100 p-6 shadow-sm flex items-center gap-5">
@@ -36,7 +36,7 @@
             </div>
             <div>
                 <div class="text-xs text-gray-500 font-medium mb-0.5">Kelas Aktif</div>
-                <div class="text-2xl font-bold text-gray-800">32</div>
+                <div class="text-2xl font-bold text-gray-800">{{ $kelasAktif }}</div>
             </div>
         </div>
     </div>
@@ -56,11 +56,9 @@
                     </div>
 
                     <div class="absolute inset-0 flex items-end justify-between px-8 z-10">
-                        <div class="w-10 bg-[#38bdf8] rounded-t-sm h-[95%]"></div>
-                        <div class="w-10 bg-[#38bdf8] rounded-t-sm h-[90%]"></div>
-                        <div class="w-10 bg-[#38bdf8] rounded-t-sm h-[98%]"></div>
-                        <div class="w-10 bg-[#38bdf8] rounded-t-sm h-[92%]"></div>
-                        <div class="w-10 bg-[#38bdf8] rounded-t-sm h-[88%]"></div>
+                        @foreach($chartData as $day => $percentage)
+                            <div class="w-10 bg-[#38bdf8] rounded-t-sm" style="height: {{ $percentage }}%;" title="{{ $day }}: {{ $percentage }}%"></div>
+                        @endforeach
                     </div>
                 </div>
                 
@@ -106,7 +104,7 @@
     </div>
 
     <div class="bg-white rounded-xl border border-gray-100 p-6 shadow-sm mb-8">
-        <h3 class="text-gray-800 font-semibold text-[15px] mb-5">Jadwal Hari Ini (X MIPA 1)</h3>
+        <h3 class="text-gray-800 font-semibold text-[15px] mb-5">Jadwal Pelajaran Hari Ini</h3>
         <div class="overflow-x-auto">
             <table class="w-full text-left border-collapse">
                 <thead>
@@ -118,18 +116,18 @@
                     </tr>
                 </thead>
                 <tbody class="text-sm text-gray-600">
-                    <tr class="border-b border-gray-50 hover:bg-gray-50 transition-colors">
-                        <td class="py-4 px-4">07:00 - 08:30</td>
-                        <td class="py-4 px-4">Matematika</td>
-                        <td class="py-4 px-4">X MIPA 1</td>
-                        <td class="py-4 px-4">Budi Santoso, M.Pd</td>
-                    </tr>
-                    <tr class="border-b border-gray-50 hover:bg-gray-50 transition-colors">
-                        <td class="py-4 px-4">08:30 - 10:00</td>
-                        <td class="py-4 px-4">Bahasa Inggris</td>
-                        <td class="py-4 px-4">X MIPA 1</td>
-                        <td class="py-4 px-4">Siti Aminah, S.Pd</td>
-                    </tr>
+                    @forelse($todaySchedules as $sch)
+                        <tr class="border-b border-gray-50 hover:bg-gray-50 transition-colors">
+                            <td class="py-4 px-4">{{ \Carbon\Carbon::parse($sch->start_time)->format('H:i') }} - {{ \Carbon\Carbon::parse($sch->end_time)->format('H:i') }}</td>
+                            <td class="py-4 px-4">{{ $sch->subject }}</td>
+                            <td class="py-4 px-4">{{ $sch->class }}</td>
+                            <td class="py-4 px-4">{{ $sch->teacher->name }}</td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="4" class="py-6 px-4 text-center text-gray-400">Tidak ada jadwal pelajaran hari ini.</td>
+                        </tr>
+                    @endforelse
                 </tbody>
             </table>
         </div>
